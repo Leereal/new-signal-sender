@@ -1,10 +1,11 @@
-const Signal = require('../Models/Signal');
-const jwt = require('jsonwebtoken');
+const Signal = require("../Models/Signal");
+const jwt = require("jsonwebtoken");
 //Main Work
-const { Socket } = require('../utils/socket');
+const { Socket } = require("../utils/socket");
 
 //1. Create Signal
 const createSignal = async (req, res) => {
+  console.log(req.body);
   try {
     //   Save to database
     const signal = await Signal.create(req.body);
@@ -14,14 +15,14 @@ const createSignal = async (req, res) => {
     //   global.io.emit('post_signal', { hello: 'world' });
 
     //Broadcast Signal to the users
-    Socket.emit('post_signal', signal);
+    Socket.emit("post_signal", signal);
 
     //Send to Emails
     //Send to Telegram Channel
     //Send to WhatsApp
     //Send to SMS
   } catch (err) {
-    res.status(500).json({ Error: 'Failed to Save', err });
+    res.status(500).json({ Error: "Failed to Save", err });
   }
 };
 
@@ -31,7 +32,7 @@ const getSignals = async (req, res) => {
     const signals = await Signal.find().sort({ createdAt: -1 }).exec();
     res.status(200).json({ signals });
   } catch (err) {
-    res.status(500).json({ Error: 'Failed to Get Values', err });
+    res.status(500).json({ Error: "Failed to Get Values", err });
   }
 };
 
@@ -42,10 +43,10 @@ const getSignal = async (req, res) => {
     res.status(200).json({ signal });
 
     if (!signal) {
-      res.status(404).json({ Error: 'Not Found' });
+      res.status(404).json({ Error: "Not Found" });
     }
   } catch (err) {
-    res.status(500).json({ Error: 'Failed to Get Signal', err });
+    res.status(500).json({ Error: "Failed to Get Signal", err });
   }
 };
 
@@ -55,7 +56,7 @@ const updateSignal = async (req, res) => {
     const signal = await Signal.findByIdAndUpdate(req.params.id, req.body);
     res.status(201).json({ signal });
   } catch (err) {
-    res.status(500).json({ Error: 'Failed to Update', err });
+    res.status(500).json({ Error: "Failed to Update", err });
   }
 };
 
@@ -63,9 +64,9 @@ const updateSignal = async (req, res) => {
 const deleteSignal = async (req, res) => {
   try {
     const signal = await Signal.findByIdAndDelete(req.params.id);
-    res.status(200).json({ msg: 'Deleted Successfully' });
+    res.status(200).json({ msg: "Deleted Successfully" });
   } catch (err) {
-    res.status(500).json({ Error: 'Failed to Delete', err });
+    res.status(500).json({ Error: "Failed to Delete", err });
   }
 };
 
@@ -73,9 +74,9 @@ const deleteSignal = async (req, res) => {
 const deleteSignals = async (req, res) => {
   try {
     const signals = await Signal.deleteMany();
-    res.status(200).json({ msg: 'Deleted Successfully' });
+    res.status(200).json({ msg: "Deleted Successfully" });
   } catch (err) {
-    res.status(500).json({ Error: 'Failed to Update', err });
+    res.status(500).json({ Error: "Failed to Update", err });
   }
 };
 

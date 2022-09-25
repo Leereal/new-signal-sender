@@ -1,26 +1,37 @@
-import React from 'react';
-import { useState } from 'react';
-import { useStateContext } from '../contexts/ContextProvider';
-import Submit from './Submit';
+import React from "react";
+import { useState } from "react";
+import { useStateContext } from "../contexts/ContextProvider";
+import Submit from "./Submit";
 
 export default function Modal({
   openModalBtn,
   modalTitle,
   submitBtnText,
   children,
+  endpoint,
+  mode = null,
+  id = null,
 }) {
   const [showModal, setShowModal] = useState(false);
-  const { currentColor, handleSubmit } = useStateContext();
+  const { currentColor, handleSubmit, saved } = useStateContext();
 
   return (
     <>
-      <Submit
-        color="white"
-        bgColor={currentColor}
-        text={openModalBtn}
-        borderRadius="10px"
-        btnClick={() => setShowModal(true)}
-      />
+      {mode === "edit" ? (
+        <i
+          className="pi pi-pencil ml-3 cursor-pointer"
+          onClick={() => setShowModal(true)}
+        ></i>
+      ) : (
+        <Submit
+          color="white"
+          bgColor={currentColor}
+          text={openModalBtn}
+          borderRadius="10px"
+          btnClick={() => setShowModal(true)}
+        />
+      )}
+
       {showModal ? (
         <>
           <div className="justify-center items-center flex  fixed inset-0 z-50 outline-none focus:outline-none">
@@ -29,7 +40,10 @@ export default function Modal({
               <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none max-h-[80vh]">
                 {/*header*/}
                 <div className="flex items-start justify-between p-5 border-b border-solid border-slate-200 rounded-t">
-                  <h3 className="text-3xl font-semibold">{modalTitle}</h3>
+                  <h3 className="text-3xl font-semibold">
+                    {mode === "edit" && "Edit "}
+                    {modalTitle}
+                  </h3>
                   <button
                     className="p-1 ml-auto bg-transparent border-0 text-black float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
                     onClick={() => setShowModal(false)}
@@ -55,9 +69,14 @@ export default function Modal({
                   <Submit
                     color="white"
                     bgColor={currentColor}
-                    text={submitBtnText}
+                    text={mode === "edit" ? "Save Changes" : submitBtnText}
                     borderRadius="10px"
-                    btnClick={handleSubmit}
+                    btnClick={() => {
+                      handleSubmit(endpoint, mode, id);
+                      if (saved) {
+                        setShowModal(false);
+                      }
+                    }}
                   />
                 </div>
               </div>
