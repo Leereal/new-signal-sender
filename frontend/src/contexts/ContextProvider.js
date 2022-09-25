@@ -1,20 +1,12 @@
-import React, { createContext, useContext, useState } from 'react';
-import io from 'socket.io-client';
+import React, { createContext, useContext, useState } from "react";
+import io from "socket.io-client";
+import axios from "axios";
 
 const API_SERVER =
-  process.env.REACT_APP_ENV === 'dev'
+  process.env.REACT_APP_ENV === "dev"
     ? process.env.REACT_APP_DEV_SERVER
     : process.env.REACT_APP__PROD_SERVER;
-  const socket_data = (data)=>{
-    
-  }
-const open_socket = (user) => {
-  const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER, {
-    upgrade: false,
-    transports: ['websockets'],
-  });
-  socket.on('server-data',socket_data)
-};
+
 const StateContext = createContext();
 
 const initialState = {
@@ -26,22 +18,27 @@ const initialState = {
 
 export const ContextProvider = ({ children }) => {
   const [screenSize, setScreenSize] = useState(undefined);
-  const [currentColor, setCurrentColor] = useState('#03C9D7');
-  const [currentMode, setCurrentMode] = useState('Light');
+  const [currentColor, setCurrentColor] = useState("#03C9D7");
+  const [currentMode, setCurrentMode] = useState("Light");
   const [themeSettings, setThemeSettings] = useState(false);
   const [activeMenu, setActiveMenu] = useState(true);
   const [isClicked, setIsClicked] = useState(initialState);
   const [user, setUser] = useState(null);
   const [formData, setFormData] = useState(null);
+  const [saved, setSaved] = useState(false);
+  const socket = io.connect(process.env.REACT_APP_SOCKET_SERVER, {
+    upgrade: false,
+    transports: ["websockets"],
+  });
 
   const setMode = (e) => {
     setCurrentMode(e.target.value);
-    localStorage.setItem('themeMode', e.target.value);
+    localStorage.setItem("themeMode", e.target.value);
   };
 
   const setColor = (color) => {
     setCurrentColor(color);
-    localStorage.setItem('colorMode', color);
+    localStorage.setItem("colorMode", color);
   };
 
   const handleClick = (clicked) =>
@@ -53,11 +50,26 @@ export const ContextProvider = ({ children }) => {
     setFormData((prevFormData) => {
       return { ...prevFormData, [field]: value };
     });
-    console.log(formData);
   };
 
-  const handleSubmit = () => {
-    console.log('Submit button clicked');
+  const handleSubmit = (endpoint, mode, id) => {
+    let url = "";
+    if (endpoint === "startServer") {
+      url = process.env.REACT_APP_DEV_SERVER + "/robots-settings/start-server";
+    } else if (endpoint === "stopServer") {
+      url = process.env.REACT_APP_DEV_SERVER + "/robots-settings/stop-server";
+    } else if (endpoint === "setRobot") {
+      if (mode === "edit") {
+        url = process.env.REACT_APP_DEV_SERVER + "/robots-settings/edit/" + id;
+      } else {
+        url = process.env.REACT_APP_DEV_SERVER + "/robots-settings/set";
+      }
+    } else {
+      url = process.env.REACT_APP_DEV_SERVER;
+    }
+    mode === "edit"
+      ? axios.patch(url, { formData }).then((response) => setSaved(true))
+      : axios.post(url, { formData }).then((response) => setSaved(true));
   };
 
   return (
@@ -83,6 +95,8 @@ export const ContextProvider = ({ children }) => {
         setUser,
         handleChange,
         handleSubmit,
+        socket,
+        saved,
       }}
     >
       {children}

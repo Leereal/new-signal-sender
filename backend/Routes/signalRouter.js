@@ -1,5 +1,5 @@
-const express = require('express');
-const authMiddleware = require('../middleware/authMiddleware');
+const express = require("express");
+const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 const {
@@ -10,20 +10,20 @@ const {
   deleteSignal,
   deleteSignals,
   //   filterSignals,
-} = require('../Controllers/signalController');
+} = require("../Controllers/signalController");
 
 //Routes list
-router.post('/', authMiddleware, createSignal);
+router.post("/", createSignal);
 
-router.get('/', getSignals);
+router.get("/", getSignals);
 
-router.get('/:id', getSignal);
+router.get("/:id", getSignal);
 
-router.patch('/:id', updateSignal);
+router.patch("/:id", updateSignal);
 
-router.delete('/:id', deleteSignal);
+router.delete("/:id", deleteSignal);
 
-router.delete('/', deleteSignals);
+router.delete("/", deleteSignals);
 
 // router.get('/query', filterSignals);
 
